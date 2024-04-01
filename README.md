@@ -27,7 +27,7 @@ pip install git+https://github.com/MPI-IS/mesh.git
 
 ### 2. Download SMPL+H and DMPL model
 
-Download SMPL+H mode from [SMPL+H](https://mano.is.tue.mpg.de/download.php) (choose Extended SMPL+H model used in AMASS project) and DMPL model from [DMPL](https://smpl.is.tue.mpg.de/download.php) (choose DMPLs compatible with SMPL). Then place all the models under "./body_model/".
+Download SMPL+H mode from [SMPL+H](https://mano.is.tue.mpg.de/download.php) (choose Extended SMPL+H model used in AMASS project) and DMPL model from [DMPL](https://smpl.is.tue.mpg.de/download.php) (choose DMPLs compatible with SMPL). Then place all the models under "./body_models/".
 
 ### 3. Download data
 HumanML3D is a 3D human motion-language dataset that originates from a combination of HumanAct12 and Amass dataset. 
@@ -56,7 +56,9 @@ HumanML3D is a 3D human motion-language dataset that originates from a combinati
 * TotalCapture (TotalCapture)
 * BMLrub (BioMotionLab_NTroje)
 
-#### Unzip all datasets. In the bracket we give the name of the unzipped file folder. Please correct yours to the given names if they are not the same.
+Unzip all datasets.
+You could use `tools/unzip_amass.py`. 
+In the bracket we give the name of the unzipped file folder.
 
 #### Place all files under the directory **./amass_data/**. The directory structure shoud look like the following:  
 ./amass_data/  
