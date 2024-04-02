@@ -1,4 +1,11 @@
-# Segment, Mirror and Relocate Motions
+'''
+Segment the motion to specified time periods
+Mirror the motion
+Relocate with new names: 000001.npy (align with text)
+
+Input  folder: './pose_data', 
+Output folder: './joints'
+'''
 import os
 import pandas as pd
 import numpy as np
@@ -44,10 +51,10 @@ def swap_left_right_pose(data):
     return data.reshape(-1, 52*3)
 
 if __name__ == '__main__':
-    index_path = './index.csv'
     save_dir = './joints'
     os.makedirs(save_dir, exist_ok=True)
 
+    index_path = './index.csv'
     index_file = pd.read_csv(index_path)
     total_amount = index_file.shape[0]
     fps = 20
@@ -64,39 +71,36 @@ if __name__ == '__main__':
             continue
         
         data = np.load(source_path, allow_pickle=True).item()
-        pos = data['pos']
         bdata_poses = data['bdata_poses']
         bdata_trans = data['bdata_trans']
         betas = data['betas']
+        jtr = data['jtr']
         
         if 'humanact12' not in source_path:
             if 'Eyes_Japan_Dataset' in source_path or 'MPI_HDM05' in source_path:
-                pos = pos[3*fps:]
                 bdata_poses = bdata_poses[3*fps:]
                 bdata_trans = bdata_trans[3*fps:]
-            
+                jtr = jtr[3*fps:]
             if 'TotalCapture' in source_path or 'MPI_Limits' in source_path:
-                pos = pos[1*fps:]
                 bdata_poses = bdata_poses[1*fps:]
                 bdata_trans = bdata_trans[1*fps:]
-            
+                jtr = jtr[1*fps:]
             if 'Transitions_mocap' in source_path:
-                pos = pos[int(0.5*fps):]
                 bdata_poses = bdata_poses[int(0.5*fps):]
                 bdata_trans = bdata_trans[int(0.5*fps):]
-            
+                jtr = jtr[int(0.5*fps):]
 
-            pos = pos[start_frame:end_frame]
             bdata_poses = bdata_poses[start_frame:end_frame]
             bdata_trans = bdata_trans[start_frame:end_frame]
+            jtr = jtr[start_frame:end_frame]
             
-            pos[..., 0] *= -1
+            jtr[..., 0] *= -1
         
-        pos_m = swap_left_right(pos)
+        jtr_m = swap_left_right(jtr)
         bdata_poses_m = swap_left_right_pose(bdata_poses)
 
-        bdata_trans_m = bdata_trans.copy()
         # mirror translation in x axis
+        bdata_trans_m = bdata_trans.copy()
         bdata_trans_m[..., 0] *= -1
         
 
@@ -105,14 +109,14 @@ if __name__ == '__main__':
             'bdata_trans': bdata_trans,
             'betas': betas,
             'gender': data['gender'],
-            'pos':pos,
+            'jtr':jtr,
         }
         new_data_m = {
             'bdata_poses': bdata_poses_m.reshape(-1, 52*3),
             'bdata_trans': bdata_trans_m,
             'betas': betas,
             'gender': data['gender'],
-            'pos': pos_m,
+            'jtr': jtr_m,
         }
 
         np.save(pjoin(save_dir, new_name), new_data)

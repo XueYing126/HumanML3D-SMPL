@@ -1,3 +1,9 @@
+'''
+Downsample AMASS data to 20 fps
+Input  folder: './amass_data', 
+Output folder: './pose_data'
+jtr only for alignment visualization
+'''
 import os
 import torch
 import numpy as np
@@ -18,7 +24,7 @@ num_dmpls = 8 # number of DMPL parameters
 male_bm = BodyModel(bm_fname=male_bm_path, num_betas=num_betas, num_dmpls=num_dmpls, dmpl_fname=male_dmpl_path).to(comp_device)
 female_bm = BodyModel(bm_fname=female_bm_path, num_betas=num_betas, num_dmpls=num_dmpls, dmpl_fname=female_dmpl_path).to(comp_device)
 
-# expected framerate, we want 20 fps
+# expect 20fps
 ex_fps = 20
 
 
@@ -27,7 +33,6 @@ def amass_to_pose(src_path, save_path):
         # ['trans':(frame_num, 3), 'gender':array('female', dtype='<U6'), 'mocap_framerate':array(120.), 'betas':(16,), 'dmpls':(frame_num, 8), 'poses':(frame_num, 156)]
         try:
             fps = bdata['mocap_framerate']
-            frame_number = bdata['trans'].shape[0]
         except:
             return 0
         
@@ -50,16 +55,18 @@ def amass_to_pose(src_path, save_path):
             'betas': torch.Tensor(np.repeat(bdata['betas'][:num_betas][np.newaxis], repeats=len(bdata_trans), axis=0)).to(comp_device),
         }
         
-        body_pose_world = bm(**body_parms)
-        pos = body_pose_world.Jtr.detach().cpu().numpy()
-        pos = pos[:, :, [0, 2, 1]]
+        body_world = bm(**body_parms)
+        jtr = body_world.Jtr.detach().cpu().numpy()
+        
+        # exchange y z, human stands on xy -> xz plane
+        jtr = jtr[:, :, [0, 2, 1]]
         
         save_data={
             'bdata_poses': bdata_poses,
             'bdata_trans': bdata_trans,
             'betas': bdata['betas'],
             'gender': bdata['gender'],
-            'pos':pos,
+            'jtr':jtr,
         }
 
         np.save(save_path, save_data)
@@ -94,10 +101,8 @@ if __name__ == '__main__':
         dataset_name = paths[0].split('/')[2]
         pbar = tqdm(paths)
         pbar.set_description('Processing: %s'%dataset_name)
-        fps = 0
         for path in pbar:
-            save_path = path.replace('./amass_data', './pose_data')
-            save_path = save_path[:-3] + 'npy'
+            save_path = path.replace('./amass_data', './pose_data').replace('.npz', '.npy')
             fps = amass_to_pose(path, save_path)
             
         cur_count += len(paths)
