@@ -11,7 +11,7 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 from os.path import join as pjoin
-
+import random
 def swap_left_right(data):
     assert len(data.shape) == 3 and data.shape[-1] == 3
     data = data.copy()
@@ -59,6 +59,7 @@ if __name__ == '__main__':
     total_amount = index_file.shape[0]
     fps = 20
 
+    dataset_names = []
     for i in tqdm(range(total_amount)):
         source_path = index_file.loc[i]['source_path']
         new_name = index_file.loc[i]['new_name']
@@ -121,3 +122,11 @@ if __name__ == '__main__':
 
         np.save(pjoin(save_dir, new_name), new_data)
         np.save(pjoin(save_dir, 'M'+new_name), new_data_m)
+
+        dataset = source_path.split('/')[2]
+        if dataset not in dataset_names:
+            prob = random.random()
+            if (prob < 0.2):
+                dataset_names.append(dataset)
+                np.save(pjoin('./vis', new_name), new_data)
+                np.save(pjoin('./vis', 'M'+new_name), new_data_m)
