@@ -86,3 +86,13 @@ In the bracket we give the name of the unzipped file folder.
 
 
 ### 4. Process Data
+
+We follow the original HumanML3D to process the data (framerate, segment, mirror). 
+In the end, you should find the data you need at './HumanML3D/smpl/'.
+
+```bash
+python s1_framrate.py
+python s2_seg_augmentation.py
+python s3_process_init.py
+python s4_cal_mean_std.py
+```
