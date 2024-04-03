@@ -1,6 +1,6 @@
 # SMPL HumanML3D: 3D Human Motion-Language Dataset
 
-Follow this repository to produce SMPL version of [HumanML3D](https://github.com/XueYing126/HumanML3D-SMPL).
+Follow this repository to produce SMPL version of [HumanML3D](https://github.com/EricGuo5513/HumanML3D).
 
 ### 1. Setup environment
 
@@ -32,8 +32,7 @@ Download SMPL+H mode from [SMPL+H](https://mano.is.tue.mpg.de/download.php) (cho
 ### 3. Download data
 HumanML3D is a 3D human motion-language dataset that originates from a combination of HumanAct12 and Amass dataset. 
 
-<details>
-  <summary><b>Get AMASS Data</b></summary>
+#### Get AMASS Data
 
 #### Download the following subdataset from [AMASS website](https://amass.is.tue.mpg.de/download.php). Note only download the <u>SMPL+H G</u> data.
 
@@ -56,11 +55,16 @@ HumanML3D is a 3D human motion-language dataset that originates from a combinati
 * TotalCapture (TotalCapture)
 * BMLrub (BioMotionLab_NTroje)
 
-Unzip all datasets.
-You could use `tools/unzip_amass.py`. 
 In the bracket we give the name of the unzipped file folder.
 
-#### Place all files under the directory **./amass_data/**. The directory structure shoud look like the following:  
+Unzip all datasets. You could use `tools/unzip_amass.py`. 
+
+ Place all files under the directory **./amass_data/**. 
+
+
+<details>
+  <summary><b>The expected directory structure</b></summary>
+  
 ./amass_data/  
 ./amass_data/ACCAD/  
 ./amass_data/BioMotionLab_NTroje/  
@@ -81,18 +85,24 @@ In the bracket we give the name of the unzipped file folder.
 ./amass_data/TotalCapture/  
 ./amass_data/Transitions_mocap/  
 
-**Please make sure the file path are correct, otherwise it can not succeed.**
+**Please make sure the file path are correct.**
 </details>
 
 
 ### 4. Process Data
 
 We follow the original HumanML3D to process the data (framerate, segment, mirror). 
-In the end, you should find the data you need at './HumanML3D/smpl/'.
+
+Run the following scripts one by one. 
 
 ```bash
 python s1_framrate.py
+
 python s2_seg_augmentation.py
+
 python s3_process_init.py
+
 python s4_cal_mean_std.py
 ```
+
+In the end, you should find the data you need at './HumanML3D/smpl/'.
