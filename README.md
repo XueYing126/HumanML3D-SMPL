@@ -93,7 +93,18 @@ Unzip all datasets. You could use `tools/unzip_amass.py`.
 
 We follow the original HumanML3D to process the data (framerate, segment, mirror). 
 
-Run the following scripts one by one. 
+#### Process HumanAct12
+First unzip 'humanact12' in './pose_data'.
+
+The following code will run [SMPLify](https://github.com/wangsen1312/joints2smpl) to get SMPL parameters from 3D joins.
+
+```bash
+python smplify_humanact12.py
+```
+Move the generated './humanact12' in root to './pose_data/'.
+
+#### Process HumanAct12 + AMASS
+Run the following to process the data. 
 
 ```bash
 python s1_framrate.py
