@@ -30,8 +30,8 @@ def swap_left_right(data):
     return data
 
 def swap_left_right_pose(data):
-    data = data.copy()
-    data = data.reshape(-1, 52, 3)
+    data = data.copy() # (num_frame, num_joint*3) num_joint: 24(humanact12), 52(amass)
+    data = data.reshape(data.shape[0], -1, 3)
 
     right_chain = [2, 5, 8, 11, 14, 17, 19, 21]
     left_chain = [1, 4, 7, 10, 13, 16, 18, 20]
@@ -48,7 +48,7 @@ def swap_left_right_pose(data):
     
     # mirror joint rot (x, y, z) -> (x, -y, -z)
     data[..., [1,2]] *=-1
-    return data.reshape(-1, 52*3)
+    return data.reshape(data.shape[0], -1)
 
 if __name__ == '__main__':
     save_dir = './joints'
@@ -66,8 +66,7 @@ if __name__ == '__main__':
         end_frame = index_file.loc[i]['end_frame']
 
         if not os.path.exists(source_path):
-            if 'humanact12' not in source_path:
-                print(f'can not find {source_path}')
+            print(f'can not find {source_path}')
             continue
         
         data = np.load(source_path, allow_pickle=True).item()
@@ -112,7 +111,7 @@ if __name__ == '__main__':
             'jtr':jtr,
         }
         new_data_m = {
-            'bdata_poses': bdata_poses_m.reshape(-1, 52*3),
+            'bdata_poses': bdata_poses_m,
             'bdata_trans': bdata_trans_m,
             'betas': betas,
             'gender': data['gender'],

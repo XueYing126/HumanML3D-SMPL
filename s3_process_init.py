@@ -27,7 +27,7 @@ def process(file_name, data_dir, save_dir):
     pose_6d = utils_transform.aa2sixd(pose_aa).reshape(poses.shape[0],-1).numpy() # [fn, 312]
 
     # '''from 6D to axis-angle'''
-    # rot_6d =  torch.Tensor(rot_6d).reshape(-1, 6)
+    # rot_6d =  torch.Tensor(pose_6d).reshape(-1, 6)
     # rot_aa_b = utils_transform.sixd2aa(rot_6d).reshape(poses.shape[0], -1).numpy()
 
 

@@ -16,8 +16,9 @@ from joints2smpl.src import config
 import smplx
 import h5py
 from joints2smpl.src.smplify import SMPLify3D
+import random
 
-device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:3" if torch.cuda.is_available() else "cpu")
 
 num_joints = 22 
 joint_category = "AMASS"
@@ -111,5 +112,9 @@ if __name__ == "__main__":
     os.makedirs(save_dir, exist_ok=True)
 
     file_list =  os.listdir(data_dir)
+    random.shuffle(file_list)
     for file_name in tqdm(file_list):
+        if os.path.exists(os.path.join(save_dir, file_name)):
+            print(f'{os.path.join(save_dir, file_name)} already exists')
+            continue
         Joints2SMPL(file_name, data_dir, save_dir)
