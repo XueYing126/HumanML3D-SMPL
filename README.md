@@ -100,6 +100,7 @@ The following code will run [SMPLify](https://github.com/wangsen1312/joints2smpl
 
 ```bash
 python smplify_humanact12.py
+# You can accelerate the process by running the same script in parallel simultaneously and utilizing multiple GPUs.
 ```
 Move the generated './humanact12' in root to './pose_data/'.
 
@@ -107,12 +108,16 @@ Move the generated './humanact12' in root to './pose_data/'.
 Run the following to process the data. 
 
 ```bash
+# Downsample AMASS data to 20 fps, runtime about  
 python s1_framrate.py
 
+# Segment, Mirror, and Relocate
 python s2_seg_augmentation.py
 
+# generate 6D rotation representation
 python s3_process_init.py
 
+# Compute the mean, std
 python s4_cal_mean_std.py
 ```
 
