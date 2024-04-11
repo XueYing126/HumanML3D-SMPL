@@ -108,7 +108,7 @@ Move the generated './humanact12' in root to './pose_data/'.
 Run the following to process the data. 
 
 ```bash
-# Downsample AMASS data to 20 fps, runtime about  
+# Downsample AMASS data to 20 fps
 python s1_framrate.py
 
 # Segment, Mirror, and Relocate
@@ -122,3 +122,13 @@ python s4_cal_mean_std.py
 ```
 
 In the end, you should find the data you need at './HumanML3D/smpl/'.
+
+```
+{
+    'bdata_poses': (frame_num, 52*3)
+    'bdata_trans': (frame_num, 3) # global position
+    'betas':        (16, )
+    'gender':       'male'/'female'
+    'pose_6d':     (frame_num, 52*6) # 6d rotation representation, better for training
+}
+```
