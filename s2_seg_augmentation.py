@@ -30,7 +30,7 @@ def swap_left_right(data):
     return data
 
 def swap_left_right_pose(data):
-    data = data.copy() # (num_frame, num_joint*3) num_joint: 24(humanact12), 52(amass)
+    data = data.copy() # (num_frame, num_joint*3) num_joint: 52 (humanact12 24 -> 52)
     data = data.reshape(data.shape[0], -1, 3)
 
     right_chain = [2, 5, 8, 11, 14, 17, 19, 21]
@@ -74,6 +74,10 @@ if __name__ == '__main__':
         bdata_trans = data['bdata_trans']
         betas = data['betas']
         jtr = data['jtr']
+        
+        if bdata_poses.shape[1] < 156: # humanact12, concatenate zeros columns for hands pose, smpl -> smpl-h
+            zeros_matrix = np.zeros((bdata_poses.shape[0], 156 - bdata_poses.shape[1]))
+            bdata_poses = np.concatenate((bdata_poses, zeros_matrix), axis=1)
         
         if 'humanact12' not in source_path:
             if 'Eyes_Japan_Dataset' in source_path or 'MPI_HDM05' in source_path:
