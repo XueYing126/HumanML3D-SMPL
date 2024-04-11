@@ -124,6 +124,7 @@ python s4_cal_mean_std.py
 In the end, you should find the data you need at './HumanML3D/smpl/'.
 
 ```
+# SMPL-H representation
 {
     'bdata_poses': (frame_num, 52*3)
     'bdata_trans': (frame_num, 3) # global position
