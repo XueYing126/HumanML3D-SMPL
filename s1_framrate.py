@@ -41,7 +41,9 @@ def amass_to_pose(src_path, save_path):
         else:
             bm = female_bm
 
-        stride = int(fps / ex_fps)
+        stride = int(round(fps / ex_fps))
+        if 'SSM' in src_path:
+            stride = 6
         num_betas = 10
 
         bdata_poses = bdata['poses'][::stride,...]
