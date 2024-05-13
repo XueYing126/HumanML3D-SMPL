@@ -75,7 +75,7 @@ if __name__ == '__main__':
         betas = data['betas']
         jtr = data['jtr']
         
-        if bdata_poses.shape[1] < 156: # humanact12, concatenate zeros columns for hands pose, smpl -> smpl-h
+        if bdata_poses.shape[1] < 156 and 'humanact12' in source_path: # humanact12, concatenate zeros columns for hands pose, smpl -> smpl-h
             zeros_matrix = np.zeros((bdata_poses.shape[0], 156 - bdata_poses.shape[1]))
             bdata_poses = np.concatenate((bdata_poses, zeros_matrix), axis=1)
         

@@ -11,6 +11,7 @@ from tqdm import tqdm
 from tools import utils_transform
 from human_body_prior.body_model.body_model import BodyModel
 import torch
+from scipy.spatial.transform import Rotation as R
 
 # Choose the device to run the body model on.
 comp_device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
@@ -23,11 +24,42 @@ def process(file_name, data_dir, save_dir):
     poses = data['bdata_poses']
     trans = data['bdata_trans']
 
+    '''Put on Floor'''
+    floor_height = data['jtr'][0, :, 1].min() # lowest point on the first frame
+    trans[:, 2] -=  floor_height
+
     '''Move the first pose to origin'''
     trans[:, [0, 1]] -= trans[0, [0, 1]] # the global position x, y 
 
-    # '''All initially face Y+/Z+'''
-    # init_root_rot = poses[0, [0, 1, 2]] # the global root orientation
+    '''All initially face Y+/Z+'''
+
+    global_orientation_ = poses[:, :3]
+    r = R.from_rotvec(global_orientation_)
+    global_orientation_euler = r.as_euler('xyz', degrees=True)
+
+    # degree to rotate
+    rot_degree = global_orientation_euler[0][2]
+    theta_z = - np.ones(global_orientation_euler.shape[0]) *  rot_degree  #global_orientation_euler[0,2]
+    
+    global_orientation_euler[:,2] = global_orientation_euler[:,2]  + theta_z
+    r = R.from_euler('xyz',global_orientation_euler, degrees=True)
+    global_orientation = r.as_rotvec()
+    poses[:, :3] = global_orientation
+
+    # rotate trans
+    theta_z = np.pi * theta_z / 180 # from angles to radian
+    theta_z = torch.from_numpy(theta_z)
+
+    tensor_0 = torch.zeros(theta_z.shape)
+    tensor_1 = torch.ones(theta_z.shape)
+    RZ = torch.stack([
+        torch.stack([torch.cos(theta_z), -torch.sin(theta_z), tensor_0]),
+        torch.stack([torch.sin(theta_z), torch.cos(theta_z), tensor_0]),
+        torch.stack([tensor_0, tensor_0, tensor_1])]).permute(-1,1,0)
+    
+    
+    trans = torch.matmul(torch.transpose(RZ, 1,2), torch.DoubleTensor(trans).unsqueeze(-1)).squeeze().numpy() 
+    trans = trans.reshape(data['bdata_trans'].shape)
 
     '''from axis-angle to 6D'''
     pose_aa = torch.Tensor(poses).reshape(-1,3)
@@ -47,6 +79,7 @@ def process(file_name, data_dir, save_dir):
     jtr = body_world.Jtr.detach().cpu().numpy()
     # exchange y z, human stands on xy -> xz plane
     jtr = jtr[:, :22, [0, 2, 1]]
+    jtr[..., 0] *= -1
 
 
     new_data={
